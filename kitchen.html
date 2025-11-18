@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Kitchen – Ticket Board</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background:#0b4f20;
+      color:white;
+      margin:0;
+    }
+    .topbar {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:10px 20px;
+      background:#083716;
+    }
+    .topbar button {
+      background:#ffffff;
+      color:#0b4f20;
+      border:none;
+      padding:6px 12px;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:14px;
+      margin-left:8px;
+    }
+    .board {
+      display:flex;
+      gap:16px;
+      padding:20px;
+    }
+    .column {
+      flex:1;
+      background:white;
+      color:black;
+      border-radius:16px;
+      padding:10px;
+      min-height:200px;
+      box-shadow:0 4px 10px rgba(0,0,0,0.2);
+    }
+    .column h3 {
+      text-align:center;
+      margin-top:4px;
+      margin-bottom:8px;
+    }
+    .ticket {
+      border:1px solid #ccc;
+      border-radius:8px;
+      padding:8px;
+      margin-bottom:8px;
+      font-size:13px;
+      background:#f9f9f9;
+    }
+    .ticket p {
+      margin:2px 0;
+    }
+    .ticket button {
+      background:#0b4f20;
+      color:white;
+      border:none;
+      padding:4px 8px;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:12px;
+      margin-top:4px;
+    }
+    .empty {
+      font-size:12px;
+      color:#666;
+      text-align:center;
+      margin-top:20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div>
+      <strong>Kitchen Ticket Board</strong> —
+      <span id="kitchenName"></span>
+    </div>
+    <div>
+      <button id="openServerBtn">Open Server App</button>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </div>
+
+  <div class="board">
+    <div class="column">
+      <h3>New Tickets</h3>
+      <div id="newTickets"></div>
+    </div>
+    <div class="column">
+      <h3>In Progress</h3>
+      <div id="inProgressTickets"></div>
+    </div>
+    <div class="column">
+      <h3>Ready</h3>
+      <div id="readyTickets"></div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('kitchenName').textContent =
+      localStorage.getItem('userName') || 'Kitchen User';
+
+    function loadTickets() {
+      return JSON.parse(localStorage.getItem('tickets') || '[]');
+    }
+
+    function saveTickets(tickets) {
+      localStorage.setItem('tickets', JSON.stringify(tickets));
+    }
+
+    function renderTickets() {
+      const tickets = loadTickets();
+      const newDiv = document.getElementById('newTickets');
+      const inProgDiv = document.getElementById('inProgressTickets');
+      const readyDiv = document.getElementById('readyTickets');
+
+      newDiv.innerHTML = '';
+      inProgDiv.innerHTML = '';
+      readyDiv.innerHTML = '';
+
+      const makeCard = (ticket, status) => {
+        const div = document.createElement('div');
+        div.className = 'ticket';
+        div.innerHTML = `
+          <p><strong>Table ${ticket.tableNumber}</strong> – ${ticket.serverName}</p>
+          <p>Subtotal: $${ticket.subtotal.toFixed(2)}</p>
+          <p><strong>Items:</strong></p>
+          <ul style="padding-left:18px; margin:2px 0;">
+            ${ticket.items.map(i => `<li>${i.qty} × ${i.name}</li>`).join('')}
+          </ul>
+          ${ticket.note ? `<p><strong>Notes:</strong> ${ticket.note}</p>` : ''}
+        `;
+
+        const btn = document.createElement('button');
+        if (status === 'new') {
+          btn.textContent = 'Mark In Progress';
+          btn.onclick = () => updateStatus(ticket.id, 'in-progress');
+        } else if (status === 'in-progress') {
+          btn.textContent = 'Mark Ready';
+          btn.onclick = () => updateStatus(ticket.id, 'ready');
+        } else if (status === 'ready') {
+          btn.textContent = 'Clear Ticket';
+          btn.onclick = () => removeTicket(ticket.id);
+        }
+        div.appendChild(btn);
+        return div;
+      };
+
+      let hasNew = false, hasInProg = false, hasReady = false;
+
+      tickets.forEach(t => {
+        if (t.status === 'new') {
+          hasNew = true;
+          newDiv.appendChild(makeCard(t, 'new'));
+        } else if (t.status === 'in-progress') {
+          hasInProg = true;
+          inProgDiv.appendChild(makeCard(t, 'in-progress'));
+        } else if (t.status === 'ready') {
+          hasReady = true;
+          readyDiv.appendChild(makeCard(t, 'ready'));
+        }
+      });
+
+      if (!hasNew) newDiv.innerHTML = '<p class="empty">No new tickets.</p>';
+      if (!hasInProg) inProgDiv.innerHTML = '<p class="empty">No tickets in progress.</p>';
+      if (!hasReady) readyDiv.innerHTML = '<p class="empty">No ready tickets.</p>';
+    }
+
+    function updateStatus(id, newStatus) {
+      const tickets = loadTickets();
+      const ticket = tickets.find(t => t.id === id);
+      if (ticket) {
+        ticket.status = newStatus;
+        saveTickets(tickets);
+        renderTickets();
+      }
+    }
+
+    function removeTicket(id) {
+      let tickets = loadTickets();
+      tickets = tickets.filter(t => t.id !== id);
+      saveTickets(tickets);
+      renderTickets();
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userRole');
+      window.location.href = 'index.html';
+    });
+
+    document.getElementById('openServerBtn').addEventListener('click', () => {
+      window.location.href = 'server.html';
+    });
+
+    renderTickets();
+  </script>
+</body>
+</html>
