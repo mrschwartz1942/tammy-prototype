@@ -55,6 +55,35 @@
 </div>
 
 <script>
+  /* -----------------------------------------
+     PRELOAD DEFAULT MENU (NEWLY ADDED)
+  ----------------------------------------- */
+  function preloadMenu() {
+    let existing = JSON.parse(localStorage.getItem("menu") || "[]");
+
+    if (existing.length === 0) {
+      const defaultMenu = [
+        { name: "Crispy Potatoes", price: 7.99 },
+        { name: "Garlic Shrimp", price: 12.49 },
+        { name: "Beef Meatballs", price: 9.99 },
+        { name: "Ham & Cheese Croquettes", price: 8.49 },
+        { name: "Spanish Omelette", price: 7.49 },
+        { name: "House Sangria", price: 8.00 },
+        { name: "Red Wine", price: 9.00 },
+        { name: "Sparkling Water", price: 3.99 },
+        { name: "Churros with Chocolate", price: 6.49 },
+        { name: "Caramel Flan", price: 5.99 }
+      ];
+      localStorage.setItem("menu", JSON.stringify(defaultMenu));
+    }
+  }
+
+  preloadMenu();
+
+  /* -----------------------------------------
+     EXISTING SERVER PAGE JAVASCRIPT
+  ----------------------------------------- */
+
   document.getElementById("serverName").innerHTML =
     "Server: " + (localStorage.getItem("username") || "");
 
