@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Reports</title>
+<style>
+  body { background:#0b4f20; margin:0; font-family:Arial; color:white; }
+  .topbar {
+    display:flex; justify-content:flex-end; gap:15px;
+    background:#093d18; padding:12px;
+  }
+  .navbtn {
+    background:white; color:black; padding:8px 14px;
+    border-radius:6px; text-decoration:none;
+  }
+  .card {
+    background:white; color:black; padding:30px;
+    margin:30px auto; border-radius:16px; max-width:600px;
+  }
+  .metric {
+    background:#eee; padding:12px; margin-top:10px; border-radius:8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="navbtn" href="manager.html">Manager Dashboard</a>
+  <a class="navbtn" href="index.html">Logout</a>
+</div>
+
+<div class="card">
+  <h2>Reports</h2>
+
+  <div id="metrics"></div>
+</div>
+
+<script>
+function loadTickets(){
+  return JSON.parse(localStorage.getItem("tickets") || "[]");
+}
+
+function generateReports(){
+  const tickets = loadTickets();
+  const totalOrders = tickets.length;
+  const ready = tickets.filter(t=>t.status==="ready").length;
+  const inProg = tickets.filter(t=>t.status==="progress").length;
+  const revenue = tickets.reduce((sum,t)=>sum + t.subtotal, 0);
+
+  // find most popular item
+  let counts = {};
+  tickets.forEach(t=>{
+    t.items.forEach(i=>{
+      counts[i.name] = (counts[i.name]||0) + i.qty;
+    });
+  });
+  let topItem = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+  let topName = topItem ? topItem[0] : "None";
+  let topQty = topItem ? topItem[1] : 0;
+
+  document.getElementById("metrics").innerHTML = `
+    <div class="metric"><b>Total Orders:</b> ${totalOrders}</div>
+    <div class="metric"><b>Orders In Progress:</b> ${inProg}</div>
+    <div class="metric"><b>Orders Ready:</b> ${ready}</div>
+    <div class="metric"><b>Total Revenue:</b> $${revenue.toFixed(2)}</div>
+    <div class="metric"><b>Most Popular Item:</b> ${topName} (${topQty})</div>
+  `;
+}
+generateReports();
+</script>
+
+</body>
+</html>

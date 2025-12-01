@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Manager Dashboard</title>
+<style>
+  body { background:#0b4f20; color:white; font-family:Arial; margin:0; }
+  .topbar {
+    display:flex; justify-content:flex-end; gap:15px;
+    background:#093d18; padding:12px;
+  }
+  .navbtn {
+    background:white; color:black; padding:8px 14px;
+    border-radius:6px; text-decoration:none;
+  }
+  .grid {
+    max-width:800px; margin:40px auto;
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:25px;
+  }
+  .card {
+    background:white; color:black; padding:30px;
+    border-radius:16px; text-align:center;
+    box-shadow:0 4px 10px rgba(0,0,0,0.2);
+  }
+  .btn {
+    display:inline-block; margin-top:15px;
+    background:#0b4f20; color:white;
+    padding:10px 20px; border-radius:10px;
+    text-decoration:none;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="navbtn" href="server.html">Server App</a>
+  <a class="navbtn" href="kitchen.html">Kitchen Board</a>
+  <a class="navbtn" href="index.html">Logout</a>
+</div>
+
+<h2 style="text-align:center;">Manager Dashboard</h2>
+
+<div class="grid">
+  <div class="card">
+    <h3>Manage Menu Items</h3>
+    <a class="btn" href="menu-edit.html">Open</a>
+  </div>
+  <div class="card">
+    <h3>View Reports</h3>
+    <a class="btn" href="reports.html">Open</a>
+  </div>
+  <div class="card">
+    <h3>Open Server App</h3>
+    <a class="btn" href="server.html">Open</a>
+  </div>
+  <div class="card">
+    <h3>Open Kitchen Board</h3>
+    <a class="btn" href="kitchen.html">Open</a>
+  </div>
+</div>
+
+</body>
+</html>
